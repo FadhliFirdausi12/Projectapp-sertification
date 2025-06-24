@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">Projectapp</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="mahasiswa">Mahasiswa</string>
+    <string name="tambah_mahasiswa">Tambah Mahasiswa</string>
+    <string name="ubah_mahasiswa">Ubah Mahasiswa</string>
+    <string name="hapus_mahasiswa">Hapus Mahasiswa</string>
+    <string name="nomor">Nomor</string>
+    <string name="nama">Nama</string>
+    <string name="tanggal_lahir">Tanggal Lahir</string>
+    <string name="kelamin">Kelamin</string>
+    <string name="alamat">Alamat</string>
+    <string name="list_kosong">Belum ada data</string>
+    <string name="informasi">Informasi</string>
+    <string name="kembali">Kembali</string>
+    <string name="nama_aplikasi">KAMPUSKU</string>
+    <string name="deskripsi_aplikasi">Aplikasi ini dirancang untuk mempermudah pencatatan, pembaruan, dan pengelolaan data mahasiswa secara efisien dan terorganisir.</string>
+    <string name="versi_aplikasi">Versi: 1.0.0</string>
+    <string name="pengembang_aplikasi">Dikembangkan oleh: Fadhli Firdausi</string>
+    <string name="kontak_pengembang">Email: firdausifadhli@gmail.com</string>
+    <string name="hak_cipta">© 2025 KAMPUSKU. Membuat pencatatan lebih mudah Go go RPLA.</string>
+
+
+
 </resources>
