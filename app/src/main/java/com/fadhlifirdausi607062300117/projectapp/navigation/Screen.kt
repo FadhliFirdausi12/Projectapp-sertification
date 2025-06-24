@@ -12,8 +12,13 @@ sealed class Screen(val route: String) {
     // Route untuk tambah data
     data object FormBaru : Screen("detailScreen")
 
-    // Route untuk ubah data
+    // Route untuk ubah data (editable)
     data object FormUbah : Screen("detailScreen/{idMahasiswa}") {
         fun withId(id: Long): String = "detailScreen/$id"
+    }
+
+    // Route untuk lihat detail (read-only)
+    data object FormDetail : Screen("detailScreenView/{idMahasiswa}") {
+        fun withId(id: Long): String = "detailScreenView/$id"
     }
 }

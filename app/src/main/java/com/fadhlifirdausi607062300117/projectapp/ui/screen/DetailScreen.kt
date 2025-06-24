@@ -28,7 +28,11 @@ const val KEY_ID_MAHASISWA = "idMahasiswa"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(navController: NavHostController, id: Long? = null) {
+fun DetailScreen(
+    navController: NavHostController,
+    id: Long? = null,
+    isReadOnly: Boolean = false
+) {
     val context = LocalContext.current
     val db = MahasiswaDb.getInstance(context)
     val factory = ViewModelFactory(db.dao)
@@ -47,7 +51,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
     val month = calendar.get(java.util.Calendar.MONTH)
     val day = calendar.get(java.util.Calendar.DAY_OF_MONTH)
 
-    // Load data untuk edit
+    // Load data untuk edit atau detail
     LaunchedEffect(id) {
         if (id != null) {
             viewModel.getMahasiswas(id)
@@ -68,39 +72,50 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(
-                    if (id == null) "Tambah Mahasiswa" else "Edit Mahasiswa",
-                    color = Color.White
-                )
+                title = {
+                    Text(
+                        when {
+                            id == null -> "Tambah Mahasiswa"
+                            isReadOnly -> "Detail Mahasiswa"
+                            else -> "Edit Mahasiswa"
                         },
+                        color = Color.White
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
+                        )
                     }
                 },
                 actions = {
-                    IconButton(onClick = {
-                        if (nomor.isBlank() || nama.isBlank() || tanggalLahir.isBlank() || alamat.isBlank()) {
-                            Toast.makeText(context, "Semua data wajib diisi!", Toast.LENGTH_SHORT).show()
-                            return@IconButton
-                        }
-
-                        if (id == null) {
-                            viewModel.insert(nomor, nama, tanggalLahir, kelamin, alamat)
-                        } else {
-                            viewModel.update(id, nomor, nama, tanggalLahir, kelamin, alamat)
-                        }
-                        navController.popBackStack()
-                    }) {
-                        Icon(Icons.Outlined.Check, contentDescription = "Simpan")
-                    }
-
-                    if (id != null) {
+                    if (!isReadOnly) {
                         IconButton(onClick = {
-                            viewModel.delete(id)
+                            if (nomor.isBlank() || nama.isBlank() || tanggalLahir.isBlank() || alamat.isBlank()) {
+                                Toast.makeText(context, "Semua data wajib diisi!", Toast.LENGTH_SHORT).show()
+                                return@IconButton
+                            }
+
+                            if (id == null) {
+                                viewModel.insert(nomor, nama, tanggalLahir, kelamin, alamat)
+                            } else {
+                                viewModel.update(id, nomor, nama, tanggalLahir, kelamin, alamat)
+                            }
                             navController.popBackStack()
                         }) {
-                            Icon(Icons.Filled.Delete, contentDescription = "Hapus")
+                            Icon(Icons.Outlined.Check, contentDescription = "Simpan")
+                        }
+
+                        if (id != null) {
+                            IconButton(onClick = {
+                                viewModel.delete(id)
+                                navController.popBackStack()
+                            }) {
+                                Icon(Icons.Filled.Delete, contentDescription = "Hapus")
+                            }
                         }
                     }
                 },
@@ -123,6 +138,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
                 label = { Text("Nomor") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
+                enabled = !isReadOnly,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -132,6 +148,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
                 label = { Text("Nama") },
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
                 singleLine = true,
+                enabled = !isReadOnly,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -140,9 +157,10 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
                 onValueChange = {},
                 label = { Text("Tanggal Lahir") },
                 readOnly = true,
+                enabled = !isReadOnly,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {
+                    .clickable(enabled = !isReadOnly) {
                         DatePickerDialog(
                             context,
                             { _, y, m, d -> tanggalLahir = "$d/${m + 1}/$y" },
@@ -153,31 +171,36 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
                     }
             )
 
-            Text("Jenis Kelamin")
-            val opsiKelamin = listOf("Laki-laki", "Perempuan")
-            opsiKelamin.forEach { jenis ->
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .selectable(
+            if (!isReadOnly) {
+                Text("Jenis Kelamin")
+                val opsiKelamin = listOf("Laki-laki", "Perempuan")
+                opsiKelamin.forEach { jenis ->
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = (kelamin == jenis),
+                                onClick = { kelamin = jenis }
+                            )
+                            .padding(4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
                             selected = (kelamin == jenis),
                             onClick = { kelamin = jenis }
                         )
-                        .padding(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = (kelamin == jenis),
-                        onClick = { kelamin = jenis }
-                    )
-                    Text(text = jenis)
+                        Text(text = jenis)
+                    }
                 }
+            } else {
+                Text("Jenis Kelamin: $kelamin")
             }
 
             OutlinedTextField(
                 value = alamat,
                 onValueChange = { alamat = it },
                 label = { Text("Alamat") },
+                enabled = !isReadOnly,
                 modifier = Modifier.fillMaxWidth()
             )
         }

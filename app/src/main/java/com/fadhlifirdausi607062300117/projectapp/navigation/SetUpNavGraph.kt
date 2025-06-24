@@ -7,15 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.fadhlifirdausi607062300117.projectapp.ui.screen.AboutScreen
-import com.fadhlifirdausi607062300117.projectapp.ui.screen.DashboardScreen
-import com.fadhlifirdausi607062300117.projectapp.ui.screen.DetailScreen
-import com.fadhlifirdausi607062300117.projectapp.ui.screen.KEY_ID_MAHASISWA
-import com.fadhlifirdausi607062300117.projectapp.ui.screen.LoginScreen
-import com.fadhlifirdausi607062300117.projectapp.ui.screen.MainScreen
-import com.fadhlifirdausi607062300117.projectapp.ui.screen.RegisterScreen
-import com.fadhlifirdausi607062300117.projectapp.ui.screen.SplashLoginBerhasil
-import com.fadhlifirdausi607062300117.projectapp.ui.screen.SplashScreenAwal
+import com.fadhlifirdausi607062300117.projectapp.ui.screen.*
 
 @Composable
 fun SetUpNavGraph(navController: NavHostController = rememberNavController()) {
@@ -45,15 +37,12 @@ fun SetUpNavGraph(navController: NavHostController = rememberNavController()) {
             MainScreen(navController = navController)
         }
 
+        // Tambah Mahasiswa (tanpa ID)
         composable(route = Screen.FormBaru.route) {
             DetailScreen(navController = navController)
         }
 
-        composable(route = Screen.AboutScreen.route) {
-            AboutScreen(navController = navController)
-        }
-
-
+        // Ubah Mahasiswa (dengan ID)
         composable(
             route = Screen.FormUbah.route,
             arguments = listOf(
@@ -61,8 +50,22 @@ fun SetUpNavGraph(navController: NavHostController = rememberNavController()) {
             )
         ) { navBackStackEntry ->
             val id = navBackStackEntry.arguments?.getLong(KEY_ID_MAHASISWA)
-            DetailScreen(navController, id)
+            DetailScreen(navController = navController, id = id, isReadOnly = false)
         }
 
+        // Detail Mahasiswa (read-only)
+        composable(
+            route = Screen.FormDetail.route,
+            arguments = listOf(
+                navArgument(KEY_ID_MAHASISWA) { type = NavType.LongType }
+            )
+        ) { navBackStackEntry ->
+            val id = navBackStackEntry.arguments?.getLong(KEY_ID_MAHASISWA)
+            DetailScreen(navController = navController, id = id, isReadOnly = true)
+        }
+
+        composable(route = Screen.AboutScreen.route) {
+            AboutScreen(navController = navController)
+        }
     }
 }

@@ -7,8 +7,9 @@ import com.fadhlifirdausi607062300117.projectapp.model.DataMahasiswa
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class MainViewModel(dao: DataMahasiswaDao): ViewModel() {
+class MainViewModel(private val dao: DataMahasiswaDao) : ViewModel() {
 
     val data: StateFlow<List<DataMahasiswa>> = dao.getMahasiswa().stateIn(
         scope = viewModelScope,
@@ -16,4 +17,9 @@ class MainViewModel(dao: DataMahasiswaDao): ViewModel() {
         initialValue = emptyList()
     )
 
+    fun delete(id: Long) {
+        viewModelScope.launch {
+            dao.deleteById(id)
+        }
+    }
 }

@@ -35,18 +35,18 @@ fun MainScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(
-                    text = stringResource(id = R.string.mahasiswa),
-                    color = Color.White
-                )
-                        },
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.mahasiswa),
+                        color = Color.White
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
                             tint = Color.White
-
                         )
                     }
                 },
@@ -82,6 +82,9 @@ fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostControlle
     val viewModel: MainViewModel = viewModel(factory = factory)
     val data by viewModel.data.collectAsState()
 
+    var selectedItem by remember { mutableStateOf<DataMahasiswa?>(null) }
+    var showDialog by remember { mutableStateOf(false) }
+
     if (data.isEmpty()) {
         Column(
             modifier = modifier
@@ -98,12 +101,58 @@ fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostControlle
             contentPadding = PaddingValues(bottom = 84.dp)
         ) {
             items(data) {
-                ListItem(catatan = it) {
-                    navController.navigate(Screen.FormUbah.withId(it.id))
-                }
+                ListItem(catatan = it, onClick = {
+                    selectedItem = it
+                    showDialog = true
+                })
                 Divider()
             }
         }
+    }
+
+    // Dialog pilihan
+    if (showDialog && selectedItem != null) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Pilihan") },
+            text = {
+                Column {
+                    Text(
+                        "Detail",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                navController.navigate(Screen.FormDetail.withId(selectedItem!!.id))
+                                showDialog = false
+                            }
+                            .padding(8.dp)
+                    )
+                    Text(
+                        "Edit",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                navController.navigate(Screen.FormUbah.withId(selectedItem!!.id))
+                                showDialog = false
+                            }
+                            .padding(8.dp)
+                    )
+                    Text(
+                        "Hapus",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                viewModel.delete(selectedItem!!.id)
+                                showDialog = false
+                            }
+                            .padding(8.dp),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            confirmButton = {},
+            dismissButton = {}
+        )
     }
 }
 
